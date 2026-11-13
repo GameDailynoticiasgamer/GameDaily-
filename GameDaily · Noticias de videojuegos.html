@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GameDaily · Noticias de videojuegos</title>
+<style>
+:root{--bg:#0b0b1a;--card:#16162e;--text:#f3f3ff;--mut:#a5a5c8;--line:#2a2a52;--c:#a855f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f2ff;--card:#fff;--text:#17132e;--mut:#5d5883;--line:#d9d4f5;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f4f2ff;--card:#fff;--text:#17132e;--mut:#5d5883;--line:#d9d4f5;color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+header{padding:28px 18px 8px;text-align:center;background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--c) 35%,transparent),transparent 70%);transition:.4s}
+h1{margin:0;font-size:clamp(28px,7vw,48px);letter-spacing:1px;font-weight:900}
+h1 span{background:linear-gradient(90deg,#ff4ecd,#a855f7,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.date{color:var(--mut);margin-top:6px;font-size:14px;text-transform:capitalize}
+nav{display:flex;gap:8px;overflow-x:auto;padding:14px 14px 6px;max-width:900px;margin:auto;scrollbar-width:none}
+nav button{flex:0 0 auto;border:2px solid var(--line);background:var(--card);color:var(--text);padding:10px 16px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;transition:.2s}
+nav button:hover{transform:translateY(-2px)}
+nav button.on{background:var(--c);border-color:var(--c);color:#fff;box-shadow:0 0 18px color-mix(in srgb,var(--c) 70%,transparent)}
+main{max-width:900px;margin:auto;padding:10px 14px 40px}
+.hero{border-radius:20px;padding:22px;margin:10px 0 16px;background:linear-gradient(135deg,var(--c),#111133);color:#fff;position:relative;overflow:hidden}
+.hero h2{margin:0 0 6px;font-size:24px}.hero p{margin:0;opacity:.92}
+.hero .big{font-size:44px;font-weight:900;margin-top:10px;letter-spacing:2px}
+.hero .emoji{position:absolute;right:14px;top:6px;font-size:70px;opacity:.25}
+.grid{display:grid;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--g);border-radius:14px;padding:14px 16px;animation:in .4s both}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 22px color-mix(in srgb,var(--g) 30%,transparent)}
+.card{transition:.2s}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--g);color:#fff;margin-right:6px}
+.tag.demo{background:transparent;border:1px solid var(--mut);color:var(--mut)}
+.card h3{margin:8px 0 4px;font-size:17px}.card p{margin:0;color:var(--mut);font-size:14px;line-height:1.45}
+.card time{font-size:12px;color:var(--mut)}
+.note{margin-top:22px;font-size:12px;color:var(--mut);text-align:center;line-height:1.5}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header><h1>🎮 <span>GameDaily</span></h1><div class="date" id="date"></div></header>
+<nav id="tabs"></nav>
+<main><div class="hero" id="hero"></div><div class="grid" id="list"></div>
+<p class="note">Noticias reales recopiladas el 12 de noviembre de 2026 de medios especializados (redactadas con palabras propias). Las marcadas como “Rumor” son filtraciones sin confirmar.</p></main>
+<script>
+var G={
+all:{n:"Todos",e:"🔥",c:"#ff4ecd",t:"Lo último de hoy",s:"Resumen de todos los juegos"},
+gta:{n:"GTA VI",e:"🚗",c:"#f97316",t:"GTA VI sale el 19 de noviembre",s:"Cuenta atrás para el lanzamiento de Rockstar"},
+gd:{n:"Geometry Dash",e:"🔷",c:"#22d3ee",t:"Geometry Dash",s:"Niveles, demons y comunidad"},
+fn:{n:"Fortnite",e:"🪂",c:"#a855f7",t:"Fortnite",s:"Temporadas, skins y eventos"},
+mc:{n:"Minecraft",e:"⛏️",c:"#22c55e",t:"Minecraft",s:"Actualizaciones y mundos nuevos"},
+rb:{n:"Roblox",e:"🧱",c:"#ef4444",t:"Roblox",s:"Experiencias de la comunidad y eventos"},
+cod:{n:"Call of Duty",e:"🔫",c:"#84cc16",t:"Call of Duty",s:"Temporadas, armas y modos"},
+val:{n:"Valorant",e:"🎯",c:"#fb7185",t:"Valorant",s:"Agentes, parches y competitivo"},
+lol:{n:"League of Legends",e:"⚔️",c:"#eab308",t:"League of Legends",s:"Campeones, parches y esports"},
+fc:{n:"EA FC",e:"⚽",c:"#3b82f6",t:"EA Sports FC",s:"Ultimate Team y fichajes"},
+gi:{n:"Genshin Impact",e:"✨",c:"#14b8a6",t:"Genshin Impact",s:"Banners, personajes y versiones"}
+};
+var N=[
+{g:"gta",d:"2026-11-12",h:"GTA VI sale el 19 de noviembre de 2026",p:"Take-Two confirmó la fecha de lanzamiento y aseguró que no habrá más retrasos.",s:"Mobalytics"},
+{g:"gta",d:"2026-11-12",h:"Rockstar confirma 212 GB de instalación y precarga",p:"Los jugadores podrán precargar el juego pocos días antes del estreno.",s:"KitGuru"},
+{g:"gta",d:"2026-11-10",h:"Primeros guiños a una versión para PC",p:"Medios informan de pistas sobre PC y un modo online para 2027; Rockstar no lo ha anunciado oficialmente.",s:"GamingBible",r:1},
+{g:"gta",d:"2026-11-05",h:"Newzoo: sin GTA VI, las consolas se estancarían en 2026",p:"La consultora destaca el peso del lanzamiento de Rockstar y de Switch 2 en los ingresos.",s:"GamesIndustry.biz"},
+{g:"gta",d:"2026-06-25",h:"Las reservas de GTA VI abrieron el 25 de junio",p:"Tras más de un año de silencio, Rockstar abrió las preventas.",s:"GamesRadar"},
+{g:"fn",d:"2026-11-08",h:"Los Sprites malditos llegan con la actualización Captain’s Day",p:"Doce nuevos Sprites aparecieron en el mapa de Fortnite el 8 de noviembre.",s:"Vice"},
+{g:"fn",d:"2026-11-04",h:"Fortnite Crew cambia los trajes del pack por V-Bucks extra",p:"Epic modifica las recompensas mensuales de la suscripción.",s:"Dot Esports"},
+{g:"fn",d:"2026-11-01",h:"Treasure Hunters: minitemporada con One Piece",p:"Llegó con la actualización 43.00 y dura hasta el evento final del Capítulo 7, el 5 de diciembre.",s:"KritGaming"},
+{g:"fn",d:"2026-11-04",h:"Rumor: el Capítulo 8 empezaría el 28 de noviembre",p:"Según el filtrador HYPEX, la nueva era llegaría a finales de mes; Epic no lo ha confirmado.",s:"Esports.gg",r:1},
+{g:"gd",d:"2026-01-12",h:"Geometry Dash bate su récord en Steam",p:"Superó los 100 000 jugadores simultáneos, por encima de Call of Duty, sin necesidad de una actualización nueva.",s:"Outlook Respawn"},
+{g:"gd",d:"2026-01-10",h:"El resurgimiento viral de 2026",p:"El juego de RobTop crece por impulso de la comunidad. No encontré una actualización oficial nueva reciente.",s:"Outlook Respawn"},
+{g:"mc",d:"2026-11-06",h:"Snapshot 26.4 de Java: hielo frágil y jukebox automático",p:"Nuevas mecánicas de exploración en las cuevas de hielo y un sistema de música más avanzado.",s:"Sumbar Bisnis"},
+{g:"mc",d:"2026-10-28",h:"Bedrock 26.60 trae la Cueva de Hielo",p:"Nuevo bioma subterráneo en zonas frías, parte de la cuarta entrega de contenido de 2026.",s:"Nintendo Everything"},
+{g:"rb",d:"2026-09-18",h:"Roblox presenta novedades en su conferencia de desarrolladores",p:"Anunció nuevas formas de jugar, crear y crecer en la plataforma.",s:"MKAU Gaming"},
+{g:"rb",d:"2026-08-30",h:"Roblox abrirá su sede regional en Riad",p:"La compañía amplía su presencia en Oriente Medio.",s:"CairoScene"},
+{g:"cod",d:"2026-10-23",h:"Modern Warfare 4 ya está disponible",p:"Ambientado en la península de Corea, sale en PS5, Xbox Series, PC y Switch 2; deja atrás PS4 y Xbox One.",s:"Call of Duty"},
+{g:"cod",d:"2026-10-16",h:"MW4 no llega a Game Pass el primer día",p:"Activision confirma que se sumará al servicio en la temporada navideña de 2027.",s:"Vice"},
+{g:"cod",d:"2026-10-16",h:"DMZ regresa y Warzone se integra con la Temporada 1",p:"El modo de extracción vuelve y Warzone se conecta con MW4 poco después del lanzamiento.",s:"Gulf News"},
+{g:"val",d:"2026-11-10",h:"Parche 13.10: mejoras a centinelas y marcadores en repeticiones",p:"Cypher, Killjoy y Vyse reciben buffs; además hay cambios en Gauntlet: Glitched.",s:"Riot / EsportNow"},
+{g:"val",d:"2026-10-27",h:"Parche 13.09 añade al agente Hush",p:"Riot también ajusta el retroceso de la Warden y a Clove.",s:"Console PC Gaming"},
+{g:"lol",d:"2026-11-04",h:"Parche 26.22: rework de Mel y nuevas skins K/DA",p:"Mel pierde su reflejo, Yasuo, Thresh y Locke reciben nerfs.",s:"Strafe"},
+{g:"lol",d:"2026-11-04",h:"TFT pasa a tener su propio cliente",p:"Las descargas serán opcionales; los Little Legends exclusivos llegan el 1 de diciembre.",s:"GameLeap"},
+{g:"lol",d:"2026-11-03",h:"Worlds 2026 se acerca a la fase eliminatoria",p:"El torneo mundial entra en su tramo decisivo mientras Riot ajusta el meta.",s:"Dot Esports"},
+{g:"fc",d:"2026-09-25",h:"EA Sports FC 27 sale con Mbappé y Bellingham en portada",p:"Tres ediciones, acceso anticipado desde el 18 de septiembre y llegada a todas las plataformas.",s:"TBreak"},
+{g:"fc",d:"2026-08-05",h:"The Grounds y FUT Gallery, las grandes novedades",p:"Modo social callejero, mercado de transferencias rehecho en Carrera y córners dinámicos.",s:"Red Bull / TBreak"},
+{g:"fc",d:"2026-09-03",h:"EA detalla requisitos y gráficos en PC",p:"Nuevo Pitch Notes con opciones gráficas y requisitos oficiales.",s:"Gameswelt"},
+{g:"gi",d:"2026-11-04",h:"Versión 7.2 “Hour of Ruin” ya disponible",p:"Nueva región en el este de Snezhnaya y continuación de la misión de arconte.",s:"Gematsu"},
+{g:"gi",d:"2026-11-04",h:"Banners: Mitya y Valeriy, con repetición de Furina",p:"La primera fase dura hasta el 24 de noviembre; luego regresan Zibai y Linnea hasta el 15 de diciembre.",s:"LootBar / Siliconera"}
+];
+var cur="all",t=document.getElementById("tabs"),L=document.getElementById("list"),H=document.getElementById("hero");
+var today=new Date(2026,10,12);
+document.getElementById("date").textContent=today.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+function fmt(d){var a=d.split("-");return new Date(a[0],a[1]-1,a[2]).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}
+function render(){
+var g=G[cur];document.documentElement.style.setProperty("--c",g.c);
+t.innerHTML="";Object.keys(G).forEach(function(k){var b=document.createElement("button");b.textContent=G[k].e+" "+G[k].n;if(k==cur)b.className="on";b.onclick=function(){cur=k;render()};t.appendChild(b)});
+var extra="";
+if(cur=="gta"){var days=Math.ceil((new Date(2026,10,19)-today)/864e5);extra='<div class="big">⏳ '+days+' días</div>'}
+H.innerHTML='<div class="emoji">'+g.e+'</div><h2>'+g.t+'</h2><p>'+g.s+'</p>'+extra;
+var items=N.filter(function(n){return cur=="all"||n.g==cur}).sort(function(a,b){return a.d<b.d?1:-1});
+L.innerHTML="";items.forEach(function(n,i){var c=document.createElement("div");c.className="card";c.style.setProperty("--g",G[n.g].c);c.style.animationDelay=i*50+"ms";
+c.innerHTML='<span class="tag">'+G[n.g].n+'</span>'+(n.r?'<span class="tag demo">Rumor</span>':'')+'<time>'+fmt(n.d)+(n.s?' · '+n.s:'')+'</time><h3>'+n.h+'</h3><p>'+n.p+'</p>';L.appendChild(c)})}
+render();
+</script>
+</body>
+</html>
